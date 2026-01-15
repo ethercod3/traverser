@@ -9,7 +9,7 @@ class DeliveryService:
         self.args = args
 
     def _craft_payload_url(self, payload: str) -> str:
-        processed_payload = f"{payload * 20}{self.args.target}"
+        processed_payload = f"{payload}{self.args.target}"
         return f"{self.args.url}".replace(self.args.payload_place, processed_payload)
 
     async def _deliver_payload(self, payload: str) -> None:
