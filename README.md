@@ -20,7 +20,7 @@ Required. Target filepath
 ### -h or --header
 Not required. Additional HTTP header. You can add multiple headers ad follows
 
-```
+```bash
 -h "Header-A: A" -h "Header-B: B"
 ```
 
