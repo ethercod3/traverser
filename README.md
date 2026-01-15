@@ -62,6 +62,8 @@ python traverser.py \
 | `-h` | `--header` | No | Additional HTTP header(s) | — |
 | `-sr` | `--simultaneous-requests` | No | Maximum number of concurrent requests | `1` |
 | `-p` | `--place` | No | Payload placeholder string | `<>` |
+| `-ss` | `--success-statuses` | No | Successfull HTTP statuses | `200-400` | 
+| `-v` | `--verbose` | No | Display verbose info | `False` |
 
 ### Multiple headers example
 
@@ -69,3 +71,12 @@ python traverser.py \
 -h "Authorization: Bearer TOKEN" \
 -h "X-Custom-Header: value"
 ```
+
+### Multiple ranges of the successfull HTTP statuses example
+
+```bash
+-ss "200-202" \
+-ss "302"
+```
+
+Second number of the range is excluded. Result status codes will be `(200, 201, 302)`

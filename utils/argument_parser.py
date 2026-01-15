@@ -2,6 +2,7 @@ import argparse
 from interfaces.parsedargs import ParsedArgs
 from utils.wordlist_reader import WordListReader
 from utils.header_parser import HeaderParser
+from utils.http_status_code_parser import HTTPStatusCodesParser
 
 
 class Parser:
@@ -71,6 +72,20 @@ class Parser:
             help="Character sequence to replace payload with",
         )
 
+        self.parser.add_argument(
+            "-ss",
+            "--success-statuses",
+            dest="success_statuses",
+            metavar="SUCCESS_STATUSES",
+            default=[],
+            action="append",
+            help="List of HTTP success statuses. You can either specify ranges like follow : A-B (A included, B excluded), or just specify a single number",
+        )
+
+        self.parser.add_argument(
+            "-v", "--verbose", action="store_true", help="Enable verbose output"
+        )
+
     def _to_dataclass(self, ns: argparse.Namespace) -> ParsedArgs:
         return ParsedArgs(
             wordlist=WordListReader(ns.wordlist).read(),
@@ -79,4 +94,8 @@ class Parser:
             headers=HeaderParser(ns.headers).parse(),
             sim_requests=ns.sim_requests,
             payload_place=ns.payload_place,
+            status_codes=HTTPStatusCodesParser(
+                ns.success_statuses or ["200-400"]
+            ).parse(),
+            verbose=ns.verbose,
         )

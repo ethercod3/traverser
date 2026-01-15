@@ -9,3 +9,5 @@ class ParsedArgs:
     headers: list[str]
     sim_requests: int
     payload_place: str
+    status_codes: set[int]
+    verbose: bool
