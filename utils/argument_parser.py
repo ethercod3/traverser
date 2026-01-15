@@ -75,7 +75,7 @@ class Parser:
         return ParsedArgs(
             wordlist=WordListReader(ns.wordlist).read(),
             url=ns.url,
-            target=ns.target,
+            target=ns.target.lstrip("/"),
             headers=HeaderParser(ns.headers).parse(),
             sim_requests=ns.sim_requests,
             payload_place=ns.payload_place,
