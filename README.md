@@ -1,5 +1,10 @@
 # Traverser
 
+![Python](https://img.shields.io/badge/Python-3.13%2B-blue?logo=python&logoColor=white)
+![Security](https://img.shields.io/badge/Category-Security%20Tool-red)
+![Web](https://img.shields.io/badge/Target-Web%20Applications-lightgrey)
+![License](https://img.shields.io/badge/License-MIT-green)
+
 Traverser is a Python-based utility for detecting **Path Traversal** vulnerabilities in web applications.  
 It automates payload injection and request handling to help identify improper file path validation.
 
