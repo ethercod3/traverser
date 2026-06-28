@@ -11,8 +11,8 @@ theme:
     - content.code.copy
   palette:
     - scheme: default
-      primary: lime
-      accent: green
+      primary: indigo
+      accent: indigo
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
