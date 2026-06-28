@@ -10,15 +10,15 @@ It automates payload injection and request handling to help identify improper fi
 
 ## Features
 
-- Automated Path Traversal vulnerability detection
-- Custom wordlist support
-- Concurrent HTTP requests
-- Flexible payload placement
-- Support for custom HTTP headers
+- Evidence-based Path Traversal vulnerability detection
+- Custom wordlist support and built-in payload profiles
+- Steady concurrent HTTP requests with session reuse
+- Flexible payload placement in URLs, query params, headers, path segments, and POST bodies
+- JSON or human-readable output
 
 ## Requirements
 
-- Python **3.13.1** or newer
+- Python **3.13** or newer
 
 ## Installation
 
@@ -43,7 +43,13 @@ source .venv/bin/activate
 ### Install dependencies
 
 ```bash
-pip install -r requirements.txt
+pip install -e .
+```
+
+For development:
+
+```bash
+pip install -e ".[dev]"
 ```
 
 ## Usage
@@ -51,11 +57,12 @@ pip install -r requirements.txt
 ### Example
 
 ```bash
-python traverser.py \
+traverser \
   -u "https://localhost:8000/image?filename={INSERT_PAYLOAD}" \
   -t /etc/passwd \
   -p "{INSERT_PAYLOAD}" \
-  -sr 5
+  --simultaneous-requests 5 \
+  --profile linux
 ```
 
 ## Command-line Arguments
@@ -63,13 +70,29 @@ python traverser.py \
 | Short | Long | Required | Description | Default |
 |------|------|----------|-------------|---------|
 | `-u` | `--url` | Yes | Target URL | — |
-| `-t` | `--target` | Yes | Target file path on the server | — |
+| `-t` | `--target` | Yes* | Target file path on the server. Can be repeated | — |
+| — | `--target-file` | No | File with one target path per line | — |
 | `-w` | `--wordlist` | No | Path to payload wordlist | `./default.wordlist` |
 | `-h` | `--header` | No | Additional HTTP header(s) | — |
 | `-sr` | `--simultaneous-requests` | No | Maximum number of concurrent requests | `1` |
 | `-p` | `--place` | No | Payload placeholder string | `<>` |
-| `-ss` | `--success-statuses` | No | Successfull HTTP statuses | `200-400` | 
+| `-ss` | `--success-statuses` | No | Successfull HTTP statuses | `200-400` |
+| — | `--timeout` | No | Total request timeout in seconds | `10.0` |
+| — | `--retries` | No | Retries for transient connection failures | `0` |
+| — | `--follow-redirects` / `--no-follow-redirects` | No | Enable or disable redirect following | follow |
+| — | `--profile` | No | Built-in payload profile: `linux`, `windows`, `encoded`, `double-encoded`, `mixed-separator` | — |
+| — | `--min-depth` / `--max-depth` | No | Traversal depth range for generated payloads | `1` / `6` |
+| — | `--query-param` | No | Place payload in a query parameter | — |
+| — | `--path-segment` | No | Place payload as a URL path segment | — |
+| — | `--header-value` | No | Place payload in the named header | — |
+| — | `--post-body` | No | Send payload as a POST body | — |
+| — | `--json` | No | Emit JSON findings | `False` |
+| — | `--output` | No | Write findings to a file | — |
+| — | `--stop-on-first` | No | Stop after first high-confidence finding | `False` |
+| — | `--max-findings` | No | Stop after N findings | — |
 | `-v` | `--verbose` | No | Display verbose info | `False` |
+
+*At least one `--target` or `--target-file` entry is required.
 
 ### Multiple headers example
 
@@ -85,4 +108,11 @@ python traverser.py \
 -ss "302"
 ```
 
-Second number of the range is excluded. Result status codes will be `(200, 201, 302)`
+Second number of the range is excluded. Result status codes will be `(200, 201, 302)`.
+
+### Development checks
+
+```bash
+python -m pytest
+python -m ruff check .
+```
