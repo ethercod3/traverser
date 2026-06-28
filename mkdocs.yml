@@ -18,7 +18,6 @@ nav:
   - Overview: index.md
   - Usage: usage.md
   - Development: development.md
-  - Improvement Plan: improvement-plan.md
 
 markdown_extensions:
   - admonition
