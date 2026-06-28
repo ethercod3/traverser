@@ -23,6 +23,7 @@ dev = [
 
 [project.scripts]
 traverser = "traverser.cli:main"
+example = "traverser.example:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -116,3 +116,11 @@ Second number of the range is excluded. Result status codes will be `(200, 201, 
 python -m pytest
 python -m ruff check .
 ```
+
+### Demo target
+
+Run a local mock target and print a sample scan report:
+
+```bash
+uv run example
+```

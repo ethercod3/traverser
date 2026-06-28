@@ -1,9 +1,6 @@
 import json
 from pathlib import Path
 
-from rich.console import Console
-from rich.table import Table
-
 from traverser.models import Finding
 
 
@@ -24,25 +21,7 @@ def serialize_findings(findings: list[Finding]) -> list[dict[str, object]]:
 def render_output(findings: list[Finding], json_output: bool) -> str:
     if json_output:
         return json.dumps(serialize_findings(findings), indent=2)
-    console = Console(record=True)
-    table = Table(title="Traverser findings")
-    table.add_column("Confidence")
-    table.add_column("Status")
-    table.add_column("Target")
-    table.add_column("Payload")
-    table.add_column("Evidence")
-    table.add_column("URL")
-    for finding in findings:
-        table.add_row(
-            finding.confidence.value,
-            str(finding.status),
-            finding.target,
-            finding.payload,
-            finding.evidence,
-            finding.url,
-        )
-    console.print(table)
-    return console.export_text(clear=False)
+    return _render_ascii_table(findings)
 
 
 def write_or_print(content: str, output: Path | None) -> None:
@@ -50,3 +29,43 @@ def write_or_print(content: str, output: Path | None) -> None:
         output.write_text(content, encoding="utf-8")
         return
     print(content)
+
+
+def _render_ascii_table(findings: list[Finding]) -> str:
+    headers = ("Confidence", "Status", "Target", "Payload", "Evidence", "URL")
+    rows = [
+        (
+            finding.confidence.value,
+            str(finding.status),
+            finding.target,
+            finding.payload,
+            finding.evidence,
+            finding.url,
+        )
+        for finding in findings
+    ]
+    widths = [
+        min(
+            max(len(row[idx]) for row in (headers, *rows)) if rows else len(headers[idx]),
+            48,
+        )
+        for idx in range(len(headers))
+    ]
+    separator = "+-" + "-+-".join("-" * width for width in widths) + "-+"
+    lines = ["Traverser findings", separator, _format_row(headers, widths), separator]
+    lines.extend(_format_row(row, widths) for row in rows)
+    lines.append(separator)
+    return "\n".join(lines)
+
+
+def _format_row(row: tuple[str, ...], widths: list[int]) -> str:
+    cells = [_clip(value, width).ljust(width) for value, width in zip(row, widths, strict=True)]
+    return "| " + " | ".join(cells) + " |"
+
+
+def _clip(value: str, width: int) -> str:
+    if len(value) <= width:
+        return value
+    if width <= 3:
+        return value[:width]
+    return value[: width - 3] + "..."

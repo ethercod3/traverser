@@ -18,7 +18,10 @@ class DeliveryService:
         self._stop = asyncio.Event()
 
     def run(self) -> list[Finding]:
-        return asyncio.run(self._async_run())
+        return asyncio.run(self.run_async())
+
+    async def run_async(self) -> list[Finding]:
+        return await self._async_run()
 
     async def _async_run(self) -> list[Finding]:
         connector = aiohttp.TCPConnector(limit=self.args.sim_requests)
@@ -99,6 +102,10 @@ class DeliveryService:
             status_success=status in self.args.status_codes,
         )
         if confidence is None:
+            return
+
+        if self.args.max_findings is not None and len(self.findings) >= self.args.max_findings:
+            self._stop.set()
             return
 
         finding = Finding(
