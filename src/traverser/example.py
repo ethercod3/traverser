@@ -1,9 +1,13 @@
 import asyncio
+import sys
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from aiohttp import web
 
+from traverser.cli import Parser
 from traverser.logging import logger
-from traverser.models import ParsedArgs, PlacementMode
+from traverser.models import ParsedArgs
 from traverser.output import render_output, write_or_print
 from traverser.scanner import DeliveryService
 
@@ -37,42 +41,61 @@ async def _start_mock_server() -> tuple[web.AppRunner, str]:
     return runner, f"http://{host}:{port}"
 
 
-def _example_args(base_url: str) -> ParsedArgs:
-    return ParsedArgs(
-        wordlist=["../"],
-        url=f"{base_url}/download?file=<>",
-        targets=("/etc/passwd", "/etc/hosts"),
-        headers={"User-Agent": "Traverser example"},
-        sim_requests=4,
-        payload_place="<>",
-        status_codes={200},
-        verbose=False,
-        timeout=5.0,
-        retries=1,
-        follow_redirects=True,
-        json_output=False,
-        output=None,
-        profiles=(),
-        min_depth=1,
-        max_depth=3,
-        placement_mode=PlacementMode.PLACEHOLDER,
-        query_param=None,
-        header_value=None,
-        stop_on_first=False,
-        max_findings=4,
-    )
+def _default_example_argv(base_url: str, wordlist_path: Path) -> list[str]:
+    return [
+        "--wordlist",
+        str(wordlist_path),
+        "--url",
+        f"{base_url}/download?file=<>",
+        "--target",
+        "/etc/passwd",
+        "--target",
+        "/etc/hosts",
+        "--header",
+        "User-Agent: Traverser example",
+        "--simultaneous-requests",
+        "4",
+        "--success-statuses",
+        "200",
+        "--timeout",
+        "5.0",
+        "--retries",
+        "1",
+        "--min-depth",
+        "1",
+        "--max-depth",
+        "3",
+        "--max-findings",
+        "4",
+    ]
 
 
-async def _run_example() -> None:
+def _example_args(
+    base_url: str,
+    wordlist_path: Path,
+    argv: list[str] | None = None,
+) -> ParsedArgs:
+    return Parser().parse([*_default_example_argv(base_url, wordlist_path), *(argv or [])])
+
+
+async def _run_example(argv: list[str] | None = None) -> None:
     runner, base_url = await _start_mock_server()
     try:
-        logger.setLevel("WARNING")
-        print(f"Mock target: {base_url}/download?file=<>")
-        findings = await DeliveryService(_example_args(base_url)).run_async()
-        write_or_print(render_output(findings, json_output=False), output=None)
+        with TemporaryDirectory(prefix="traverser-example-") as temp_dir:
+            wordlist_path = Path(temp_dir) / "wordlist.txt"
+            wordlist_path.write_text("../\n", encoding="utf-8")
+
+            logger.setLevel("WARNING")
+            print(f"Mock target: {base_url}/download?file=<>")
+            args = _example_args(base_url, wordlist_path, argv)
+            findings = await DeliveryService(args).run_async()
+            write_or_print(render_output(findings, json_output=args.json_output), output=args.output)
     finally:
         await runner.cleanup()
 
 
-def main() -> None:
-    asyncio.run(_run_example())
+def main(argv: list[str] | None = None) -> None:
+    args = sys.argv[1:] if argv is None else argv
+    if args[:1] == ["--"]:
+        args = args[1:]
+    asyncio.run(_run_example(args))
