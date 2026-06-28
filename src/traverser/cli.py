@@ -138,8 +138,7 @@ class Parser:
         if ns.max_findings is not None and ns.max_findings <= 0:
             self.parser.error("--max-findings must be greater than 0")
         placement_modes = sum(
-            bool(item)
-            for item in (ns.query_param, ns.path_segment, ns.header_value, ns.post_body)
+            bool(item) for item in (ns.query_param, ns.path_segment, ns.header_value, ns.post_body)
         )
         if placement_modes > 1:
             self.parser.error("choose only one placement helper")

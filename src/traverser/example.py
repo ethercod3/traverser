@@ -19,8 +19,7 @@ async def _download_handler(request: web.Request) -> web.Response:
     if "etc/passwd" in filename:
         return web.Response(
             text=(
-                "root:x:0:0:root:/root:/bin/bash\n"
-                "daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\n"
+                "root:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\n"
             )
         )
     if "etc/hosts" in filename:
@@ -89,7 +88,9 @@ async def _run_example(argv: list[str] | None = None) -> None:
             print(f"Mock target: {base_url}/download?file=<>")
             args = _example_args(base_url, wordlist_path, argv)
             findings = await DeliveryService(args).run_async()
-            write_or_print(render_output(findings, json_output=args.json_output), output=args.output)
+            write_or_print(
+                render_output(findings, json_output=args.json_output), output=args.output
+            )
     finally:
         await runner.cleanup()
 
