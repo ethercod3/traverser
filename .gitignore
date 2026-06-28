@@ -4,6 +4,7 @@ __pycache__/
 .venv/
 build/
 dist/
+site/
 *.egg-info/
 htmlcov/
 .coverage

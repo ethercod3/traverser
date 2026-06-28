@@ -1,0 +1,27 @@
+site_name: Traverser
+site_description: Evidence-based path traversal scanner
+repo_url: https://github.com/ethercod3/traverser
+repo_name: ethercod3/traverser
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: black
+      accent: red
+
+nav:
+  - Overview: index.md
+  - Usage: usage.md
+  - Development: development.md
+  - Improvement Plan: improvement-plan.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.inlinehilite

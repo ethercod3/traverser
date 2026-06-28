@@ -20,6 +20,9 @@ dev = [
     "pytest-asyncio",
     "ruff",
 ]
+docs = [
+    "mkdocs-material",
+]
 
 [project.scripts]
 traverser = "traverser.cli:main"
